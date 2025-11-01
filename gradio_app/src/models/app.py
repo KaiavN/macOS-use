@@ -167,6 +167,7 @@ class MacOSUseGradioApp:
         
         # Map provider to environment variable name
         provider_to_env = {
+            "OpenRouter": "OPENROUTER_API_KEY",
             "OpenAI": "OPENAI_API_KEY",
             "Anthropic": "ANTHROPIC_API_KEY",
             "Google": "GEMINI_API_KEY",
