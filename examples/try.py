@@ -39,11 +39,15 @@ def set_llm(llm_provider:str = None):
 
 # Try to set LLM based on available API keys
 llm = None
-if os.getenv('GEMINI_API_KEY'):
+# OpenRouter with hardcoded key as default
+llm = set_llm('openrouter')
+
+# Fallback to environment keys if OpenRouter fails
+if not llm and os.getenv('GEMINI_API_KEY'):
 	llm = set_llm('google')
-elif os.getenv('OPENAI_API_KEY'):
+elif not llm and os.getenv('OPENAI_API_KEY'):
 	llm = set_llm('OAI')
-elif os.getenv('ANTHROPIC_API_KEY'):
+elif not llm and os.getenv('ANTHROPIC_API_KEY'):
 	llm = set_llm('anthropic')
 
 if not llm:
