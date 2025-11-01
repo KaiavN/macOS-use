@@ -18,25 +18,36 @@ from mlx_use.controller.service import Controller
 def set_llm(llm_provider:str = None):
 	if not llm_provider:
 		raise ValueError("No llm provider was set")
-	
+
+	if llm_provider == "openrouter":
+		return ChatOpenAI(
+			model='minimax/minimax-m2:free',
+			api_key=SecretStr('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'),
+			base_url='https://openrouter.ai/api/v1'
+		)
+
 	if llm_provider == "OAI" and os.getenv('OPENAI_API_KEY'):
 		return ChatOpenAI(model='gpt-4', api_key=SecretStr(os.getenv('OPENAI_API_KEY')))
-	
+
 	if llm_provider == "google" and os.getenv('GEMINI_API_KEY'):
 		return ChatGoogleGenerativeAI(model='gemini-2.0-flash-exp', api_key=SecretStr(os.getenv('GEMINI_API_KEY')))
-	
+
 	if llm_provider == "anthropic" and os.getenv('ANTHROPIC_API_KEY'):
 		return ChatAnthropic(model='claude-3-sonnet-20240229', api_key=SecretStr(os.getenv('ANTHROPIC_API_KEY')))
-	
+
 	return None
 
 # Try to set LLM based on available API keys
 llm = None
-if os.getenv('GEMINI_API_KEY'):
+# OpenRouter with hardcoded key as default
+llm = set_llm('openrouter')
+
+# Fallback to environment keys if OpenRouter fails
+if not llm and os.getenv('GEMINI_API_KEY'):
 	llm = set_llm('google')
-elif os.getenv('OPENAI_API_KEY'):
+elif not llm and os.getenv('OPENAI_API_KEY'):
 	llm = set_llm('OAI')
-elif os.getenv('ANTHROPIC_API_KEY'):
+elif not llm and os.getenv('ANTHROPIC_API_KEY'):
 	llm = set_llm('anthropic')
 
 if not llm:
@@ -46,29 +57,34 @@ controller = Controller()
 
 
 async def main():
+	print("macOS Agent - Type your tasks (Ctrl+C to exit)")
+	print("=" * 50)
 
-	agent_greeting = Agent(
-		task='Say "Hi there $whoami,  What can I do for you today?"',
-		llm=llm,
-		controller=controller,
-		use_vision=False,
-		max_actions_per_step=1,
-		max_failures=5
-	)
-  
-	await agent_greeting.run(max_steps=25)
-	task = input("Enter the task: ")
-  
-	agent_task = Agent(
-		task=task,
-		llm=llm,
-		controller=controller,
-		use_vision=False,
-		max_actions_per_step=4,
-		max_failures=5
-	)
-	
-	await agent_task.run(max_steps=25)
+	try:
+		while True:
+			# Prompt for task
+			task = input("\n> Enter task: ")
+
+			# Skip empty inputs
+			if not task.strip():
+				continue
+
+			# Create and run agent for this task
+			agent = Agent(
+				task=task,
+				llm=llm,
+				controller=controller,
+				use_vision=False,
+				max_actions_per_step=4,
+				max_failures=5
+			)
+
+			await agent.run(max_steps=25)
+			print("\n" + "=" * 50)
+
+	except KeyboardInterrupt:
+		print("\n\nExiting macOS Agent. Goodbye!")
+		sys.exit(0)
 
 
 asyncio.run(main())

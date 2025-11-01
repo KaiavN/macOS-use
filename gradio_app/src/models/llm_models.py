@@ -6,6 +6,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 # LLM model mappings
 LLM_MODELS = {
+    "OpenRouter": ["minimax/minimax-m2:free"],
     "OpenAI": ["gpt-4o", "o3-mini"],
     "Anthropic": ["claude-3-5-sonnet-20240620", "claude-3-7-sonnet-20250219"],
     "Google": ["gemini-1.5-flash-002", "gemini-2.0-flash-exp"],
@@ -15,7 +16,13 @@ LLM_MODELS = {
 def get_llm(provider: str, model: str, api_key: str) -> Optional[object]:
     """Initialize LLM based on provider"""
     try:
-        if provider == "OpenAI":
+        if provider == "OpenRouter":
+            return ChatOpenAI(
+                model=model,
+                api_key=SecretStr(api_key),
+                base_url="https://openrouter.ai/api/v1"
+            )
+        elif provider == "OpenAI":
             return ChatOpenAI(model=model, api_key=SecretStr(api_key))
         elif provider == "Anthropic":
             return ChatAnthropic(model=model, api_key=SecretStr(api_key))
