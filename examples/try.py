@@ -57,29 +57,34 @@ controller = Controller()
 
 
 async def main():
+	print("macOS Agent - Type your tasks (Ctrl+C to exit)")
+	print("=" * 50)
 
-	agent_greeting = Agent(
-		task='Say "Hi there $whoami,  What can I do for you today?"',
-		llm=llm,
-		controller=controller,
-		use_vision=False,
-		max_actions_per_step=1,
-		max_failures=5
-	)
-  
-	await agent_greeting.run(max_steps=25)
-	task = input("Enter the task: ")
-  
-	agent_task = Agent(
-		task=task,
-		llm=llm,
-		controller=controller,
-		use_vision=False,
-		max_actions_per_step=4,
-		max_failures=5
-	)
-	
-	await agent_task.run(max_steps=25)
+	try:
+		while True:
+			# Prompt for task
+			task = input("\n> Enter task: ")
+
+			# Skip empty inputs
+			if not task.strip():
+				continue
+
+			# Create and run agent for this task
+			agent = Agent(
+				task=task,
+				llm=llm,
+				controller=controller,
+				use_vision=False,
+				max_actions_per_step=4,
+				max_failures=5
+			)
+
+			await agent.run(max_steps=25)
+			print("\n" + "=" * 50)
+
+	except KeyboardInterrupt:
+		print("\n\nExiting macOS Agent. Goodbye!")
+		sys.exit(0)
 
 
 asyncio.run(main())
