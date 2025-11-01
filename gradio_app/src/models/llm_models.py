@@ -16,7 +16,13 @@ LLM_MODELS = {
 def get_llm(provider: str, model: str, api_key: str) -> Optional[object]:
     """Initialize LLM based on provider"""
     try:
-        if provider == "OpenAI":
+        if provider == "OpenRouter":
+            return ChatOpenAI(
+                model=model,
+                api_key=SecretStr(api_key),
+                base_url="https://openrouter.ai/api/v1"
+            )
+        elif provider == "OpenAI":
             return ChatOpenAI(model=model, api_key=SecretStr(api_key))
         elif provider == "Anthropic":
             return ChatAnthropic(model=model, api_key=SecretStr(api_key))
