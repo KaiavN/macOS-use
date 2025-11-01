@@ -220,6 +220,7 @@ class MacOSUseGradioApp:
     def get_saved_api_key(self, provider: str) -> str:
         """Get saved API key from .env file based on provider"""
         provider_to_env = {
+            "OpenRouter": "OPENROUTER_API_KEY",
             "OpenAI": "OPENAI_API_KEY",
             "Anthropic": "ANTHROPIC_API_KEY",
             "Google": "GEMINI_API_KEY",
