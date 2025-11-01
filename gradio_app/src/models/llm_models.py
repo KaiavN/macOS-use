@@ -6,6 +6,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 # LLM model mappings
 LLM_MODELS = {
+    "OpenRouter": ["minimax/minimax-m2:free"],
     "OpenAI": ["gpt-4o", "o3-mini"],
     "Anthropic": ["claude-3-5-sonnet-20240620", "claude-3-7-sonnet-20250219"],
     "Google": ["gemini-1.5-flash-002", "gemini-2.0-flash-exp"],
